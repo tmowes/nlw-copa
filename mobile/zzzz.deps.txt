@@ -1,0 +1,57 @@
+ya @hookform/resolvers @react-navigation/bottom-tabs @react-navigation/native @react-navigation/native-stack axios date-fns intl native-base phosphor-react-native react-hook-form zod
+
+npx expo install @react-native-async-storage/async-storage expo-font expo-linear-gradient react-native-gesture-handler react-native-reanimated react-native-safe-area-context react-native-screens react-native-svg @expo-google-fonts/roboto
+
+yad babel-plugin-module-resolver react-native-svg-transformer eslint @piktew/eslint-config-react
+
+
+
+
+          {/* <Avatar source={{
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
+          <Avatar
+            source={{
+
+            }}
+          />
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
+          <Avatar
+            source={{
+
+            }}
+          >
+
+          </Avatar>
