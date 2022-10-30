@@ -1,5 +1,5 @@
 <h1 align="center">
-	Next Level Week Copa
+ Next Level Week Copa
 </h1>
 <p align="center">
   <a href="https://www.linkedin.com/in/julio-cesar-mowes/">
@@ -17,7 +17,6 @@
 </h1>
 
 ## 💻 Project
-
 
 ## 🚀 Technologies
 
@@ -38,8 +37,3 @@ Made by TMoweS :wave: [Get in touch!](https://www.linkedin.com/in/julio-cesar-mo
 [expo]: https://expo.io/
 [reactjs]: https://reactjs.org
 [rn]: https://facebook.github.io/react-native/
-[yarn]: https://yarnpkg.com/
-[vs]: https://code.visualstudio.com/
-[vceditconfig]: https://marketplace.visualstudio.com/items?itemName=EditorConfig.EditorConfig
-[vceslint]: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
-[prettier]: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
