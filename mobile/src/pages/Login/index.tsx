@@ -3,7 +3,6 @@ import { GoogleLogo } from 'phosphor-react-native'
 
 import LogoSvg from '@assets/logo.svg'
 import { useAuth } from '@contexts/AuthProvider'
-import { NoParticipantsMessage } from '@pages/PoolDetails/NoParticipantsMessage'
 
 export function Login() {
   const [_, setUser] = useAuth((store) => store.user)

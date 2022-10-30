@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native'
 import { EmptyPoolsList } from '@components/EmptyPoolsList'
 import { PoolCard } from '@components/PoolCard'
 import { poolsData } from '@utils/sampleData'
-import { PrivateNavProps } from '@routes/types'
+import { PoolsNavProps } from '@routes/types'
 
 export function Home() {
-  const { navigate } = useNavigation<PrivateNavProps>()
+  const { navigate } = useNavigation<PoolsNavProps>()
   return (
     <VStack flex={1} bg="transparent" alignItems="center" pt="6" px="6">
       <Button

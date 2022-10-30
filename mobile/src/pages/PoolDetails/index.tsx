@@ -3,17 +3,16 @@ import { useEffect, useState } from 'react'
 import { Divider, VStack } from 'native-base'
 import { useNavigation, useRoute } from '@react-navigation/native'
 
-import { PoolDetailsRouteProp, PrivateNavProps } from '@routes/types'
+import { PoolDetailsRouteProp, PoolsNavProps } from '@routes/types'
 import { poolsData } from '@utils/sampleData'
 
 import { NoParticipantsMessage } from './NoParticipantsMessage'
 import { PoolHeader } from './PoolHeader'
 import { PoolContent } from './PoolContent'
-// import { PoolGuesses } from './PoolGuesses'
 
 export function PoolDetails() {
   const { params } = useRoute<PoolDetailsRouteProp>()
-  const { setOptions } = useNavigation<PrivateNavProps>()
+  const { setOptions } = useNavigation<PoolsNavProps>()
   const [poolData, setPoolData] = useState<typeof poolsData[0] | null>(null)
 
   useEffect(() => {
