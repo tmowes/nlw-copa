@@ -7,14 +7,20 @@ export type PublicRoutesProps = {
 }
 
 export type PrivateRoutesProps = {
-  home: undefined
   new: undefined
-  search: undefined
-  'pool-details': { id: string }
+  pools: undefined
 }
 
 export type PublicNavProps = NativeStackNavigationProp<PublicRoutesProps>
 
 export type PrivateNavProps = BottomTabNavigationProp<PrivateRoutesProps>
 
-export type PoolDetailsRouteProp = RouteProp<PrivateRoutesProps, 'pool-details'>
+export type PoolsRoutesProps = {
+  home: undefined
+  search: undefined
+  'pool-details': { id: string }
+}
+
+export type PoolsNavProps = NativeStackNavigationProp<PoolsRoutesProps>
+
+export type PoolDetailsRouteProp = RouteProp<PoolsRoutesProps, 'pool-details'>

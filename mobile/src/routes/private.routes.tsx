@@ -1,25 +1,21 @@
 import { Platform } from 'react-native'
 
-import { CaretLeft, Export, PlusCircle, SoccerBall } from 'phosphor-react-native'
+import { PlusCircle, SoccerBall } from 'phosphor-react-native'
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
-import { Heading, IconButton, Text, useTheme } from 'native-base'
-import { useNavigation } from '@react-navigation/native'
+import { Heading, useTheme } from 'native-base'
 
-import { Home } from '@pages/Home'
 import { CreatePool } from '@pages/CreatePool'
-import { SearchPool } from '@pages/SearchPool'
-import { PoolDetails } from '@pages/PoolDetails'
 
-import { PrivateNavProps, PrivateRoutesProps } from './types'
+import { PrivateRoutesProps } from './types'
+import PoolsRoutes from './pools.route'
 
 const { Navigator, Screen } = createBottomTabNavigator<PrivateRoutesProps>()
 
 export default function PrivateRoutes() {
   const { colors, sizes } = useTheme()
-  const { navigate } = useNavigation<PrivateNavProps>()
 
   const screenOptions: BottomTabNavigationOptions = {
     tabBarInactiveTintColor: colors.$gray['200'],
@@ -41,21 +37,8 @@ export default function PrivateRoutes() {
     },
   }
 
-  function CustomGoBackButtom() {
-    return (
-      <IconButton
-        onPress={() => navigate('home')}
-        icon={<CaretLeft size={24} color={colors.$gray['300']} />}
-      />
-    )
-  }
-
-  function CustomShareButton() {
-    return <IconButton icon={<Export size={24} color={colors.$gray['300']} />} />
-  }
-
   return (
-    <Navigator screenOptions={screenOptions} initialRouteName="home">
+    <Navigator screenOptions={screenOptions} initialRouteName="pools">
       <Screen
         name="new"
         component={CreatePool}
@@ -70,35 +53,16 @@ export default function PrivateRoutes() {
         }}
       />
       <Screen
-        name="home"
-        component={Home}
+        name="pools"
+        component={PoolsRoutes}
         options={{
+          headerShown: false,
           tabBarIcon: ({ color }) => <SoccerBall color={color} size={22} />,
           tabBarLabel: ({ color }) => (
             <Heading color={color} ml="4" lineHeight="xl" fontSize="md">
               Meus bolões
             </Heading>
           ),
-          headerTitle: 'Meus bolões',
-        }}
-      />
-      <Screen
-        name="search"
-        component={SearchPool}
-        options={{
-          tabBarButton: () => null,
-          headerLeft: () => <CustomGoBackButtom />,
-          headerTitle: 'Buscar por código',
-        }}
-      />
-      <Screen
-        name="pool-details"
-        component={PoolDetails}
-        options={{
-          tabBarButton: () => null,
-          headerLeft: () => <CustomGoBackButtom />,
-          headerRight: () => <CustomShareButton />,
-          headerTitle: 'Detalhes',
         }}
       />
     </Navigator>
