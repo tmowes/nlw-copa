@@ -12,6 +12,9 @@ async function bootstrap() {
 
   fastify.get('/pools/count', async () => {
     const poolsCount = await prisma.pool.count()
+    console.log('#######################################')
+    console.log(poolsCount, new Date().toISOString())
+    console.log('#######################################')
     return { count: poolsCount }
   })
 

@@ -1,9 +1,13 @@
+/* eslint-disable no-alert */
 import Image from 'next/image'
+import { FormEvent, useRef } from 'react'
+import { GetStaticProps } from 'next'
 
 import previewImg from '../assets/mobile-preview.png'
 import avataresImg from '../assets/avatares.png'
 import logoSvg from '../assets/logo.svg'
 import checkSvg from '../assets/check-icon.svg'
+import { api } from '../lib/axios'
 
 type HomeProps = {
   usersCount: number
@@ -13,6 +17,23 @@ type HomeProps = {
 
 export default function Home(props: HomeProps) {
   const { guessesCount, poolsCount, usersCount } = props
+  const poolRef = useRef<HTMLInputElement>(null)
+
+  const onCreatePool = async (e: FormEvent) => {
+    e.preventDefault()
+    // console.log('pool created', { title: poolRef.current?.value })
+    try {
+      const { data } = await api.post('/pools', { title: poolRef.current?.value })
+      if (poolRef.current) poolRef.current.value = ''
+      await navigator.clipboard.writeText(data.code)
+      alert(
+        `Bolão criado com sucesso! Código:${data.code} foi copiado para a área de transferência`,
+      )
+    } catch (error) {
+      console.error(error)
+      alert('Falha ao criar bolão, tente novamente!')
+    }
+  }
 
   return (
     <div className="max-w-[1124px] h-screen mx-auto grid grid-cols-2 items-center">
@@ -27,8 +48,9 @@ export default function Home(props: HomeProps) {
             <span className="text-ignite-500">+{usersCount}</span> pessoas já estão usando
           </strong>
         </div>
-        <form className="mt-10 flex gap-2">
+        <form onSubmit={onCreatePool} className="mt-10 flex gap-2">
           <input
+            ref={poolRef}
             type="text"
             required
             placeholder="Qual nome do seu bolão?"
@@ -67,19 +89,24 @@ export default function Home(props: HomeProps) {
         src={previewImg}
         alt="Dois celulares exibindo uma prévia da aplicação móvel do NLW Copa"
         quality={100}
+        priority
       />
     </div>
   )
 }
-export const getServerSideProps = async () => {
-  const response = await fetch('http://localhost:3333/pools/count')
-  const { count } = await response.json()
+export const getStaticProps: GetStaticProps = async () => {
+  const [users, pools, guesses] = await Promise.all([
+    api.get('/users/count'),
+    api.get('/pools/count'),
+    api.get('/guesses/count'),
+  ])
 
   return {
     props: {
-      usersCount: count,
-      poolsCount: count,
-      guessesCount: count,
+      usersCount: users.data.count,
+      poolsCount: pools.data.count,
+      guessesCount: guesses.data.count,
     },
+    revalidate: 60 * 10, // 10 minutes
   }
 }
