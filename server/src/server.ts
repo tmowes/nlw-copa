@@ -1,6 +1,8 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
+import z from 'zod'
 import { PrismaClient } from '@prisma/client'
+import SUID from 'short-unique-id'
 
 const prisma = new PrismaClient({ log: ['query'] })
 
@@ -9,8 +11,39 @@ async function bootstrap() {
   await fastify.register(cors, { origin: true })
 
   fastify.get('/pools/count', async () => {
-    const poolCount = await prisma.pool.count()
-    return { count: poolCount }
+    const poolsCount = await prisma.pool.count()
+    return { count: poolsCount }
+  })
+
+  fastify.get('/users/count', async () => {
+    const usersCount = await prisma.user.count()
+    return { count: usersCount }
+  })
+
+  fastify.get('/guesses/count', async () => {
+    const guessesCount = await prisma.guess.count()
+    return { count: guessesCount }
+  })
+
+  fastify.post('/pools', async (request, reply) => {
+    const createPoolBody = z.object({
+      title: z.string(),
+    })
+
+    const { title } = createPoolBody.parse(request.body)
+
+    const generateCode = new SUID({ length: 6 })
+
+    const code = String(generateCode()).toUpperCase()
+
+    await prisma.pool.create({
+      data: {
+        title,
+        code,
+      },
+    })
+
+    return reply.status(201).send({ code })
   })
 
   await fastify.listen({ port: 3333, host: '0.0.0.0' })
