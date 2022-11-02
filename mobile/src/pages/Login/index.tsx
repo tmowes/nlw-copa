@@ -2,10 +2,10 @@ import { Button, Center, Text } from 'native-base'
 import { GoogleLogo } from 'phosphor-react-native'
 
 import LogoSvg from '@assets/logo.svg'
-import { useAuth } from '@contexts/AuthProvider'
+import { useSignIn } from '@contexts/AuthProvider'
 
 export function Login() {
-  const [_, setUser] = useAuth((store) => store.user)
+  const { onSignInWithGoogle } = useSignIn()
 
   return (
     <Center flex={1} bg="transparent" px="6">
@@ -16,7 +16,7 @@ export function Login() {
         bg="$red.500"
         mt="12"
         leftIcon={<GoogleLogo color="white" weight="bold" size={22} />}
-        onPress={() => setUser({ user: 'Julius M.' })}
+        onPress={onSignInWithGoogle}
       >
         ENTRAR COM GOOGLE
       </Button>
