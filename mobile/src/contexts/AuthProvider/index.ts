@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
 import * as Google from 'expo-auth-session/providers/google'
 import * as AuthSession from 'expo-auth-session'
 import * as WebBrowser from 'expo-web-browser'
 
 import createFastContext from '@contexts/FastContext'
+import { api } from '@services/api'
 
 import { clientId } from '../../secrets'
 import { AuthContextProps } from './types'
@@ -32,7 +33,7 @@ const useSignIn = () => {
     try {
       setLoading({ loading: true })
       await promptAsync()
-      setUser({ user: { name: 'Julius M.', avatarUrl: 'http://github.com/tmowes.png' } })
+      // setUser({ user: { name: 'Julius M.', avatarUrl: 'http://github.com/tmowes.png' } })
     } catch (error) {
       console.log(error)
     } finally {
@@ -40,15 +41,38 @@ const useSignIn = () => {
     }
   }
 
-  const onSignInWithGoogleSuccess = async (token: string) => {
-    console.log('onSignInWithGoogleSuccess ==>>', token)
-  }
+  const onSignInWithGoogleSuccess = useCallback(async (access_token: string) => {
+    try {
+      setLoading({ loading: true })
+      const { data } = await api.post('/users', { access_token })
+      if (!data?.token) {
+        console.error('Error: Invalid token')
+        setUser({ user: null })
+        return
+      }
+      api.defaults.headers.Authorization = `Bearer ${data.token}`
+      const { data: userData } = await api.get('/me')
+      console.log({ userData })
+      setUser({
+        user: {
+          name: userData.user.name,
+          avatarUrl: userData.user.avatarUrl,
+        },
+      })
+    } catch (error) {
+      setUser({ user: null })
+      console.error(error)
+    } finally {
+      setLoading({ loading: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (response?.type === 'success' && response?.authentication?.accessToken) {
       onSignInWithGoogleSuccess(response.authentication.accessToken)
     }
-  }, [response])
+  }, [onSignInWithGoogleSuccess, response])
 
   return { onSignInWithGoogle, user, loading }
 }

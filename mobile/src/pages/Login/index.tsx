@@ -5,7 +5,7 @@ import LogoSvg from '@assets/logo.svg'
 import { useSignIn } from '@contexts/AuthProvider'
 
 export function Login() {
-  const { onSignInWithGoogle } = useSignIn()
+  const { onSignInWithGoogle, loading } = useSignIn()
 
   return (
     <Center flex={1} bg="transparent" px="6">
@@ -17,6 +17,8 @@ export function Login() {
         mt="12"
         leftIcon={<GoogleLogo color="white" weight="bold" size={22} />}
         onPress={onSignInWithGoogle}
+        isLoading={loading}
+        isLoadingText="Entrando..."
       >
         ENTRAR COM GOOGLE
       </Button>

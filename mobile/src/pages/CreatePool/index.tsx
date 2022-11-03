@@ -1,27 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { Button, Heading, Input, Text, VStack } from 'native-base'
 
 import LogoSvg from '@assets/logo.svg'
+import { api } from '@services/api'
 
 export function CreatePool() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const poolName = 'Bolão do Julius'
+  const [poolName, setPoolName] = useState('')
 
-  const onCreateNewPool = () => {
-    setIsSubmitting(true)
-    console.log('create new pool')
-  }
-
-  useEffect(() => {
-    let timeout: NodeJS.Timeout
-    if (isSubmitting) {
-      timeout = setTimeout(() => {
-        setIsSubmitting(false)
-      }, 500)
+  const onCreateNewPool = async () => {
+    try {
+      setIsSubmitting(true)
+      console.log('create new pool', poolName)
+      const { data } = await api.post('/pools', { title: poolName })
+      // Alert.alert('Pool created', data.code)
+      console.log('Pool created =>>>>', data.code)
+      setPoolName('')
+    } catch (error) {
+      console.error('error', error)
+    } finally {
+      setIsSubmitting(false)
     }
-    return () => clearTimeout(timeout)
-  }, [isSubmitting])
+  }
 
   return (
     <VStack flex={1} bg="transparent" alignItems="center" pt="8" px="6">
@@ -29,10 +30,12 @@ export function CreatePool() {
       <Heading color="white" textAlign="center" fontSize="2xl" my="8">
         Crie seu próprio bolão da copa e compartilhe entre amigos!
       </Heading>
+
       <Input
         placeholder="Qual nome do seu bolão?"
         mb="4"
         value={poolName}
+        onChangeText={setPoolName}
         returnKeyType="send"
         onSubmitEditing={onCreateNewPool}
       />
