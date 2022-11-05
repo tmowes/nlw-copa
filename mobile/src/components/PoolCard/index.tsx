@@ -2,11 +2,13 @@ import { TouchableOpacity } from 'react-native'
 
 import { Avatar, Heading, HStack, Text, VStack } from 'native-base'
 
+import { getInitials } from '@utils/getInitialsFromName'
+
 import { PoolCardProps } from './types'
 
 export function PoolCard(props: PoolCardProps) {
   const { data, onPress } = props
-  const { createdBy, poolName, participants } = data
+  const { owner, title, participants, _count } = data
   return (
     <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
       <HStack
@@ -21,9 +23,9 @@ export function PoolCard(props: PoolCardProps) {
         h="20"
       >
         <VStack flex={1} h="full" justifyContent="space-between">
-          <Heading fontSize="md">{poolName}</Heading>
+          <Heading fontSize="md">{title}</Heading>
           <Text fontSize="xs" color="$gray.200">
-            Criado por {createdBy}
+            Criado por {owner.name}
           </Text>
         </VStack>
         <Avatar.Group
@@ -49,12 +51,12 @@ export function PoolCard(props: PoolCardProps) {
             },
           }}
         >
-          {participants.length === 0 ? (
+          {_count.participants === 0 ? (
             <Avatar>0</Avatar>
           ) : (
-            participants.map(({ uri, initials }) => (
-              <Avatar key={uri} source={{ uri }}>
-                {initials}
+            participants.map(({ user }) => (
+              <Avatar key={user.name} source={{ uri: user.avatarUrl }}>
+                {getInitials(user.name)}
               </Avatar>
             ))
           )}

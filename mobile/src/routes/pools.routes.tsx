@@ -3,12 +3,13 @@ import {
   NativeStackNavigationOptions,
 } from '@react-navigation/native-stack'
 import { IconButton, useTheme } from 'native-base'
-import { CaretLeft, Export } from 'phosphor-react-native'
+import { CaretLeft } from 'phosphor-react-native'
 import { useNavigation } from '@react-navigation/native'
 
 import { Home } from '@pages/Home'
 import { PoolDetails } from '@pages/PoolDetails'
 import { SearchPool } from '@pages/SearchPool'
+import { CustomShareButton } from '@components/ShareButton'
 
 import { PoolsNavProps, PoolsRoutesProps } from './types'
 
@@ -34,10 +35,6 @@ export default function PoolsRoutes() {
         icon={<CaretLeft size={24} color={colors.$gray['300']} />}
       />
     )
-  }
-
-  function CustomShareButton() {
-    return <IconButton icon={<Export size={24} color={colors.$gray['300']} />} />
   }
 
   return (

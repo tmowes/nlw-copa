@@ -1,12 +1,47 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { Button, FlatList, Heading, HStack, Text, VStack } from 'native-base'
+import { Button, FlatList, Heading, HStack, Text, useToast, VStack } from 'native-base'
+import { GameProps } from '@models/types'
 
 import { GuessCard } from '@components/GuessCard'
-import { sampleGuesses } from '@utils/sampleData'
+import { Loading } from '@components/Loading'
+import { api } from '@services/api'
 
-export function PoolContent() {
+import { PoolContentProps } from './types'
+
+export function PoolContent(props: PoolContentProps) {
+  const { poolId } = props
+  const toast = useToast()
+  const [isLoading, setIsLoading] = useState(false)
   const [selected, setSelected] = useState<'guesses' | 'ranking'>('guesses')
+
+  const [poolGames, setPoolGames] = useState<GameProps[]>([])
+
+  const loadGames = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const { data } = await api.get(`/pools/${poolId}/games`)
+      setPoolGames(data.games)
+    } catch (error) {
+      console.error(error)
+      toast.show({
+        title: 'Não foi possível carregar o bolão',
+        placement: 'top',
+        bg: 'red.500',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [poolId, toast])
+
+  useEffect(() => {
+    loadGames()
+  }, [loadGames])
+
+  if (isLoading) {
+    return <Loading />
+  }
+
   return (
     <VStack flex={1}>
       <HStack w="full" justifyContent="space-between" p="1" bg="$gray.600" rounded="md" mb="4">
@@ -35,9 +70,9 @@ export function PoolContent() {
       </HStack>
       {selected === 'guesses' ? (
         <FlatList
-          data={sampleGuesses}
-          keyExtractor={(item) => item.gameId}
-          renderItem={({ item }) => <GuessCard data={item} />}
+          data={poolGames}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <GuessCard data={item} poolId={poolId} />}
         />
       ) : (
         <Text color="$gray.200" lineHeight={24} textAlign="center" px="12">

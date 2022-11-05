@@ -7,24 +7,22 @@ import * as WebBrowser from 'expo-web-browser'
 import createFastContext from '@contexts/FastContext'
 import { api } from '@services/api'
 
-import { clientId } from '../../secrets'
 import { AuthContextProps } from './types'
 
 WebBrowser.maybeCompleteAuthSession()
 
-const { StoreProvider: AuthProvider, useStore: useAuth } = createFastContext<AuthContextProps>({
-  user: null,
-  loading: false,
-})
+const contextInitialState: AuthContextProps = { user: null, loading: false }
+
+const createdFastContext = createFastContext(contextInitialState)
+
+const { StoreProvider: AuthProvider, useStore: useAuth } = createdFastContext
 
 const useSignIn = () => {
-  const [user, setUser] = useAuth((store) => store.user)
-  const [loading, setLoading] = useAuth((store) => store.loading)
+  const [user, setUser] = useAuth((s) => s.user)
+  const [loading, setLoading] = useAuth((s) => s.loading)
 
-  // console.log(AuthSession.makeRedirectUri({ useProxy: true }))
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId,
+  const [_, response, promptAsync] = Google.useAuthRequest({
+    clientId: process.env.GOOGLE_CLIENT_ID,
     redirectUri: AuthSession.makeRedirectUri({ useProxy: true }),
     scopes: ['profile', 'email'],
   })
@@ -33,7 +31,6 @@ const useSignIn = () => {
     try {
       setLoading({ loading: true })
       await promptAsync()
-      // setUser({ user: { name: 'Julius M.', avatarUrl: 'http://github.com/tmowes.png' } })
     } catch (error) {
       console.log(error)
     } finally {
@@ -41,32 +38,34 @@ const useSignIn = () => {
     }
   }
 
-  const onSignInWithGoogleSuccess = useCallback(async (access_token: string) => {
-    try {
-      setLoading({ loading: true })
-      const { data } = await api.post('/users', { access_token })
-      if (!data?.token) {
-        console.error('Error: Invalid token')
+  const onSignInWithGoogleSuccess = useCallback(
+    async (access_token: string) => {
+      try {
+        setLoading({ loading: true })
+        const { data } = await api.post('/users', { access_token })
+        if (!data?.token) {
+          console.error('Error: Invalid token')
+          setUser({ user: null })
+          return
+        }
+        api.defaults.headers.Authorization = `Bearer ${data.token}`
+        const { data: userData } = await api.get('/me')
+        console.log({ userData })
+        setUser({
+          user: {
+            name: userData.user.name,
+            avatarUrl: userData.user.avatarUrl,
+          },
+        })
+      } catch (error) {
         setUser({ user: null })
-        return
+        console.error(error)
+      } finally {
+        setLoading({ loading: false })
       }
-      api.defaults.headers.Authorization = `Bearer ${data.token}`
-      const { data: userData } = await api.get('/me')
-      console.log({ userData })
-      setUser({
-        user: {
-          name: userData.user.name,
-          avatarUrl: userData.user.avatarUrl,
-        },
-      })
-    } catch (error) {
-      setUser({ user: null })
-      console.error(error)
-    } finally {
-      setLoading({ loading: false })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    },
+    [setLoading, setUser],
+  )
 
   useEffect(() => {
     if (response?.type === 'success' && response?.authentication?.accessToken) {

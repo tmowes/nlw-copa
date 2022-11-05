@@ -1,11 +1,5 @@
+import { PoolProps } from '@models/types'
+
 export type PoolHeaderProps = {
-  data: {
-    code: string
-    poolName: string
-    createdBy: string
-    participants: {
-      uri: string
-      initials: string
-    }[]
-  }
+  data: Pick<PoolProps, 'title' | 'code' | '_count' | 'participants'>
 }

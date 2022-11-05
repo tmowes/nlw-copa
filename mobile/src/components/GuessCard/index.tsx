@@ -1,17 +1,68 @@
-import { VStack, Heading, HStack, Center, Text, Image, useTheme, Button } from 'native-base'
+import { useCallback, useState } from 'react'
+
+import { VStack, Heading, HStack, Center, Text, useTheme, Button, useToast } from 'native-base'
 import { Check, X } from 'phosphor-react-native'
+import { getName } from 'country-list'
+import CountryFlag from 'react-native-country-flag'
 
 import { ScoreboardInput } from '@components/ScoreboardInput'
 import { convertISOdate } from '@utils/convertISOdate'
+import { api } from '@services/api'
 
 import { GuessCardProps } from './types'
 
 export function GuessCard(props: GuessCardProps) {
-  const { data } = props
-  const { awayTeam, awayTeamLogo, date, guess, homeTeam, homeTeamLogo, status } = data
+  const { data, poolId } = props
+
+  const { homeTeamCountryCode, awayTeamCountryCode, date, guess, id } = data
   const { colors } = useTheme()
+  const toast = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [homeTeamGoals, setHomeTeamGoals] = useState(guess?.homeTeamGoals ?? 0)
+  const [awayTeamGoals, setAwayTeamGoals] = useState(guess?.awayTeamGoals ?? 0)
 
   console.log(new Date(date).toISOString())
+
+  const isExpired = new Date(date).getTime() < new Date().getTime()
+
+  const onGuessConfirm = useCallback(async () => {
+    if (!poolId?.trim() || !id?.trim()) {
+      return
+    }
+    console.log('confirm guess', {
+      poolId,
+      gameId: id,
+      homeTeamGoals,
+      awayTeamGoals,
+    })
+    try {
+      setIsSubmitting(true)
+      await api.post(`/pools/${poolId}/games/${id}/guesses`, {
+        homeTeamGoals,
+        awayTeamGoals,
+      })
+      // console.log(data)
+    } catch (error: any) {
+      console.error(error)
+
+      if (error.response?.data?.message === 'Game already started') {
+        toast.show({
+          title: 'Não é possível palpitar em jogos que já começaram',
+          placement: 'top',
+          bg: 'red.500',
+        })
+        return
+      }
+
+      toast.show({
+        title: 'Não foi possível enviar seu palpite',
+        placement: 'top',
+        bg: 'red.500',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [awayTeamGoals, homeTeamGoals, id, poolId, toast])
 
   return (
     <VStack
@@ -28,7 +79,7 @@ export function GuessCard(props: GuessCardProps) {
     >
       <VStack w="full" alignItems="center">
         <Heading fontSize="sm" lineHeight="xl">
-          {homeTeam} vs. {awayTeam}
+          {getName(homeTeamCountryCode)} vs. {getName(awayTeamCountryCode)}
         </Heading>
         <Text color="$gray.200" fontSize="xs" lineHeight="xl">
           {convertISOdate(date)}
@@ -42,15 +93,21 @@ export function GuessCard(props: GuessCardProps) {
         justifyContent="space-between"
         mt="4"
       >
-        <ScoreboardInput />
-        <Image w="8" h="6" source={{ uri: homeTeamLogo }} alt={homeTeam} />
+        <ScoreboardInput
+          value={String(homeTeamGoals)}
+          onChangeText={(e) => setHomeTeamGoals(Number(e))}
+        />
+        <CountryFlag isoCode={homeTeamCountryCode} size={25} style={{ marginRight: 12 }} />
         <Center flex={1}>
           <X size={24} color={colors.$gray['200']} />
         </Center>
-        <Image w="8" h="6" source={{ uri: awayTeamLogo }} alt={awayTeam} />
-        <ScoreboardInput />
+        <CountryFlag isoCode={awayTeamCountryCode} size={25} style={{ marginLeft: 12 }} />
+        <ScoreboardInput
+          value={String(awayTeamGoals)}
+          onChangeText={(e) => setAwayTeamGoals(Number(e))}
+        />
       </HStack>
-      {status === 'pending' && (
+      {!guess && !isExpired && (
         <Button
           rightIcon={<Check size={20} color={colors.$white} />}
           bg="$green.500"
@@ -63,11 +120,14 @@ export function GuessCard(props: GuessCardProps) {
           h="9"
           mt="4"
           mb="0"
+          onPress={onGuessConfirm}
+          isLoading={isSubmitting}
+          isLoadingText="Enviando palpite..."
         >
           CONFIRMAR PALPITE
         </Button>
       )}
-      {status === 'expired' && (
+      {!guess && isExpired && (
         <Button
           h="9"
           mt="4"

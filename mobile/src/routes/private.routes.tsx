@@ -10,7 +10,7 @@ import { Heading, useTheme } from 'native-base'
 import { CreatePool } from '@pages/CreatePool'
 
 import { PrivateRoutesProps } from './types'
-import PoolsRoutes from './pools.route'
+import PoolsRoutes from './pools.routes'
 
 const { Navigator, Screen } = createBottomTabNavigator<PrivateRoutesProps>()
 

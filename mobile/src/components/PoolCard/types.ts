@@ -1,12 +1,6 @@
+import { PoolProps } from '@models/types'
+
 export type PoolCardProps = {
-  data: {
-    code: string
-    poolName: string
-    createdBy: string
-    participants: {
-      uri: string
-      initials: string
-    }[]
-  }
+  data: PoolProps
   onPress: () => void
 }

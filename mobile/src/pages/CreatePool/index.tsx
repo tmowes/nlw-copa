@@ -1,24 +1,41 @@
 import { useState } from 'react'
 
-import { Button, Heading, Input, Text, VStack } from 'native-base'
+import { Button, Heading, Input, Text, useToast, VStack } from 'native-base'
 
 import LogoSvg from '@assets/logo.svg'
 import { api } from '@services/api'
 
 export function CreatePool() {
+  const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [poolName, setPoolName] = useState('')
 
   const onCreateNewPool = async () => {
+    if (!poolName.trim()) {
+      toast.show({
+        title: 'O nome da bolão é obrigatório',
+        placement: 'top',
+        bg: 'red.500',
+      })
+      return
+    }
     try {
       setIsSubmitting(true)
-      console.log('create new pool', poolName)
       const { data } = await api.post('/pools', { title: poolName })
-      // Alert.alert('Pool created', data.code)
-      console.log('Pool created =>>>>', data.code)
+      toast.show({
+        title: 'Bolão criado com sucesso!',
+        description: `Código da pool: ${data.code}`,
+        bg: 'green.500',
+      })
       setPoolName('')
     } catch (error) {
       console.error('error', error)
+
+      toast.show({
+        title: 'Não foi possível criar o bolão',
+        placement: 'top',
+        bg: 'red.500',
+      })
     } finally {
       setIsSubmitting(false)
     }

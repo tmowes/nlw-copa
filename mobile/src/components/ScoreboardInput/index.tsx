@@ -1,6 +1,6 @@
-import { Input } from 'native-base'
+import { Input, IInputProps } from 'native-base'
 
-export function ScoreboardInput() {
+export function ScoreboardInput(props: IInputProps) {
   return (
     <Input
       w="10"
@@ -12,6 +12,7 @@ export function ScoreboardInput() {
       _focus={{
         bg: '$gray.700',
       }}
+      {...props}
     />
   )
 }

@@ -20,6 +20,9 @@
       "@hooks/*": [
         "./src/hooks/*"
       ],
+      "@models/*": [
+        "./src/models/*"
+      ],
       "@pages/*": [
         "./src/pages/*"
       ],

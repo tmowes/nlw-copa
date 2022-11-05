@@ -1,17 +1,20 @@
 import { HStack, VStack, Heading, Avatar, Text } from 'native-base'
 
+import { getInitials } from '@utils/getInitialsFromName'
+
 import { PoolHeaderProps } from './types'
 
 export function PoolHeader(props: PoolHeaderProps) {
   const { data } = props
+  const { title, code, _count, participants } = data
   return (
     <HStack w="full" alignItems="center" h="12" py="1">
       <VStack flex={1} h="full" justifyContent="space-between">
-        <Heading fontSize="md">{data?.poolName}</Heading>
+        <Heading fontSize="md">{title}</Heading>
         <Text fontSize="xs" color="$gray.200">
           Código:{' '}
           <Heading fontSize="xs" color="$gray.200">
-            {data?.code}
+            {code}
           </Heading>
         </Text>
       </VStack>
@@ -38,12 +41,12 @@ export function PoolHeader(props: PoolHeaderProps) {
           },
         }}
       >
-        {data.participants.length === 0 ? (
+        {_count.participants === 0 ? (
           <Avatar>0</Avatar>
         ) : (
-          data.participants.map(({ uri, initials }) => (
-            <Avatar key={uri} source={{ uri }}>
-              {initials}
+          participants.map(({ user }) => (
+            <Avatar key={user.name} source={{ uri: user.avatarUrl }}>
+              {getInitials(user.name)}
             </Avatar>
           ))
         )}
